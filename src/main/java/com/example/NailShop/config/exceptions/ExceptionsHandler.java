@@ -1,6 +1,6 @@
 package com.example.NailShop.config.exceptions;
 
-import org.springframework.boot.servlet.actuate.web.exchanges.HttpExchangesFilter;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -13,13 +13,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.nio.file.AccessDeniedException;
 
 @RestControllerAdvice
-public class TratadorDeErros {
-
-    private final HttpExchangesFilter httpExchangesFilter;
-
-    public TratadorDeErros(HttpExchangesFilter httpExchangesFilter) {
-        this.httpExchangesFilter = httpExchangesFilter;
-    }
+public class ExceptionsHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity tratarErro400(MethodArgumentNotValidException ex){
@@ -51,6 +45,11 @@ public class TratadorDeErros {
     }
     @ExceptionHandler(HttpServerErrorException.InternalServerError.class)
     public ResponseEntity tratarErro500(){
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("O servidor explodiu!");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("O servidor explodiu!");
+    }
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> tratarErroDeDuplicidade(DataIntegrityViolationException ex) {
+        // Aqui você devolve o erro bonitinho, sem expor o banco de dados!
+        return ResponseEntity.badRequest().body("Erro: O dado informado (como CPF ou Email) já está em uso por outro usuário no sistema!");
     }
 }
