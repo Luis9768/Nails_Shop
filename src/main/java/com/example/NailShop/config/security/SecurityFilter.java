@@ -1,5 +1,6 @@
 package com.example.NailShop.config.security;
 
+import com.example.NailShop.repository.ProfissionalRepository;
 import com.example.NailShop.repository.UsuarioRepository;
 import com.example.NailShop.service.TokenService;
 import jakarta.servlet.FilterChain;
