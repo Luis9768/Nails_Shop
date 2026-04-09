@@ -2,6 +2,7 @@ package com.example.NailShop.controller;
 
 import com.example.NailShop.dto.Usuario.LoginUsuarioDto;
 import com.example.NailShop.dto.Usuario.TokenJwtDto;
+import com.example.NailShop.entity.Cliente;
 import com.example.NailShop.entity.Usuario;
 import com.example.NailShop.service.TokenService;
 import jakarta.validation.Valid;

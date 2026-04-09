@@ -7,5 +7,4 @@ import java.util.Optional;
 
 public interface ProfissionalRepository extends JpaRepository<Profissionais, Integer> {
     Optional<Profissionais> findByEmail(String email);
-
 }

@@ -3,29 +3,29 @@ package com.example.NailShop.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-@Data
-@Entity
+
 @Table(name = "usuarios")
+@Entity(name = "usuarios")
+@Getter
+@Setter
+@NoArgsConstructor // Lombok cria construtor vazio (obrigatório pro JPA)
+@AllArgsConstructor // Lombok cria construtor com tudo
+@EqualsAndHashCode(of = "id")
 public class Usuario implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usuarioId", nullable = false)
     private Integer id;
-
-    @Size(max = 60)
-    @NotNull
-    @Column(name = "nome", nullable = false, length = 60)
-    private String nome;
 
     @Size(max = 80)
     @NotNull
@@ -37,14 +37,12 @@ public class Usuario implements UserDetails {
     @Column(name = "senha", nullable = false)
     private String senha;
 
-    @Size(max = 20)
-    @NotNull
-    @Column(name = "contato", nullable = false, length = 20)
-    private String contato;
-
     @ColumnDefault("1")
     @Column(name = "ativo")
-    private Boolean ativo = true;
+    private Boolean ativo;
+
+    @Enumerated(EnumType.STRING)
+    private Perfil perfil;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -60,12 +58,24 @@ public class Usuario implements UserDetails {
     public String getUsername() {
         return email;
     }
-    @Enumerated(EnumType.STRING)
-    @Column(name = "perfil", nullable = false)
-    private Perfil perfil;
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
     @Override
     public boolean isEnabled() {
-        return Boolean.TRUE.equals(ativo);
+        return this.ativo != null ? this.ativo : false;
     }
 }

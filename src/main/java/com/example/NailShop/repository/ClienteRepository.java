@@ -1,11 +1,11 @@
 package com.example.NailShop.repository;
 
 import com.example.NailShop.entity.Cliente;
-import com.example.NailShop.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
-    Optional<Usuario> findByEmail(String email);
+public interface ClienteRepository extends JpaRepository<Cliente,Integer> {
+    boolean existsByEmail(String email);
+    Optional<Cliente> findByEmail(String email);
 }
