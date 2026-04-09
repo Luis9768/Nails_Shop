@@ -46,6 +46,10 @@ public class Profissionais {
     @Column(name = "ativo")
     private Boolean ativo;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "perfil", nullable = false)
+    private Perfil perfil;
+
     @OneToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;

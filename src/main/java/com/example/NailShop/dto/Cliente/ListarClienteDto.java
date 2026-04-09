@@ -1,20 +1,17 @@
 package com.example.NailShop.dto.Cliente;
 
-import com.example.NailShop.entity.Perfil;
 import com.example.NailShop.entity.Cliente;
 
-public record CadastroClienteDto(
+public record ListarClienteDto(
         String nome,
-        String email,
         String contato,
-        String senha
+        String email
 ) {
-    public CadastroClienteDto(Cliente cliente){
+    public  ListarClienteDto(Cliente cliente){
         this(
                 cliente.getNome(),
-                cliente.getEmail(),
                 cliente.getContato(),
-                null
+                cliente.getEmail()
         );
     }
 }

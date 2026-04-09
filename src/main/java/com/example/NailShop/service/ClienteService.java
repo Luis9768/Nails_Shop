@@ -1,7 +1,9 @@
 package com.example.NailShop.service;
 
+import com.example.NailShop.config.exceptions.ConflictException;
 import com.example.NailShop.dto.Cliente.AtualizarClienteDto;
 import com.example.NailShop.dto.Cliente.CadastroClienteDto;
+import com.example.NailShop.dto.Cliente.ListarClienteDto;
 import com.example.NailShop.entity.Perfil;
 import com.example.NailShop.entity.Cliente;
 import com.example.NailShop.entity.Usuario;
@@ -11,6 +13,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ClienteService {
@@ -24,26 +28,26 @@ public class ClienteService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional
-    public CadastroClienteDto Adicionar(CadastroClienteDto dto){
+    public CadastroClienteDto adicionar(CadastroClienteDto dto){
         if(clienteRepository.existsByEmail(dto.email())){
-             throw new IllegalArgumentException("Email já cadastrado!");
+             throw new ConflictException("Email já cadastrado!");
         }
-        String senhaCriptografada = passwordEncoder.encode(dto.senha());
+        String senha = passwordEncoder.encode(dto.senha());
 
         Usuario usuario = new Usuario();
         usuario.setEmail(dto.email());
-        usuario.setSenha(senhaCriptografada);
+        usuario.setSenha(senha);
         usuario.setAtivo(true);
         usuario.setPerfil(Perfil.CLIENTE);
         
-        usuarioRepository.save(usuario); // Correção: Salva o usuário primeiro
+        usuarioRepository.save(usuario);
 
         Cliente cliente = new Cliente();
         cliente.setUsuario(usuario);
         cliente.setNome(dto.nome());
         cliente.setContato(dto.contato());
         cliente.setEmail(dto.email());
-        cliente.setSenha(senhaCriptografada);
+        cliente.setSenha(senha);
         cliente.setPerfil(Perfil.CLIENTE);
         
         clienteRepository.save(cliente);
@@ -51,16 +55,20 @@ public class ClienteService {
     }
     
     @Transactional
-    public AtualizarClienteDto Atualizar (Cliente cliente, AtualizarClienteDto dto){
-        Cliente clienteBanco = clienteRepository.findByEmail(cliente.getUsuario().getEmail()).orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado!"));
+    public AtualizarClienteDto atualizar (Usuario usuario, AtualizarClienteDto dto){
+        Cliente clienteBanco = clienteRepository.findByEmail(usuario.getEmail()).orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado!"));
         Usuario usuarioBanco = clienteBanco.getUsuario();
 
-        usuarioBanco.setEmail(dto.email());
-        
+        if(dto.email() != null && !dto.email().isBlank()) {
+            usuarioBanco.setEmail(dto.email());
+            clienteBanco.setEmail(dto.email());
+        }
+        if(dto.nome() != null && !dto.nome().isBlank()){
         clienteBanco.setNome(dto.nome());
-        clienteBanco.setContato(dto.contato());
-        clienteBanco.setEmail(dto.email());
-        
+        }
+        if(dto.contato() !=null && !dto.contato().isBlank()) {
+            clienteBanco.setContato(dto.contato());
+        }
         // Correção: Atualiza a senha APENAS se o usuário enviou uma nova
         if (dto.senha() != null && !dto.senha().isBlank()) {
             String novaSenhaCriptografada = passwordEncoder.encode(dto.senha());
@@ -73,7 +81,7 @@ public class ClienteService {
         return new AtualizarClienteDto(clienteBanco);
     }
     
-    public void InativarUsuario(Usuario usuarioLogado){
+    public void inativarUsuario(Usuario usuarioLogado){
         Cliente clienteBanco = clienteRepository.findByEmail(usuarioLogado.getEmail()).orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado!"));
         Usuario usuarioBanco = clienteBanco.getUsuario(); // Correção: Reaproveita a busca
 
@@ -83,4 +91,13 @@ public class ClienteService {
         clienteRepository.save(clienteBanco);
         usuarioRepository.save(usuarioBanco);
     }
+
+    public List<ListarClienteDto> listar(Usuario usuarioLogado){
+        var ehAdmin = usuarioLogado.getPerfil() == Perfil.ADMIN;
+        if (!ehAdmin) {
+            throw new IllegalArgumentException("Você não tem permissão para ver os usuários!");
+        }
+        return clienteRepository.findAll().stream().map(ListarClienteDto::new).toList();
+    }
+
 }

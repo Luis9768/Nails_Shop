@@ -7,17 +7,14 @@ public record CriarProfissionalDto(
         String nome,
         String email,
         String contato,
-        String senha,
-        Perfil perfil
-) {/*
-    public CriarProfissionalDto(Profissionais profissionais){
+        String senha
+) {
+    public CriarProfissionalDto(Profissionais profissionais) {
         this(
                 profissionais.getNome(),
                 profissionais.getEmail(),
-                profissionais.getContato()
-                null,
-                profissionais.get
+                profissionais.getContato(),
+                null
         );
     }
-    */
 }
