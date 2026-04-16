@@ -82,6 +82,7 @@ public class ClienteService {
     }
     
     public void inativarUsuario(Usuario usuarioLogado){
+
         Cliente clienteBanco = clienteRepository.findByEmail(usuarioLogado.getEmail()).orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado!"));
         Usuario usuarioBanco = clienteBanco.getUsuario(); // Correção: Reaproveita a busca
 
